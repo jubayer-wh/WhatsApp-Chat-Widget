@@ -58,9 +58,8 @@
 
   const setupWidget = (widget) => {
     const button = widget.querySelector('.wcw-button');
-    const panel = widget.querySelector('.wcw-panel');
     const form = widget.querySelector('.wcw-form');
-    const closeBtn = widget.querySelector('.wcw-close');
+    const panel = widget.querySelector('.wcw-panel');
 
     if (button && panel) {
       button.addEventListener('click', () => {
@@ -68,17 +67,12 @@
       });
     }
 
-    if (closeBtn && panel) {
-      closeBtn.addEventListener('click', () => setPanelState(widget, false));
-    }
-
     if (form) {
       form.addEventListener('submit', (event) => {
         event.preventDefault();
 
-        const phoneField = form.querySelector('.wcw-select');
         const messageField = form.querySelector('.wcw-input');
-        const phone = phoneField ? phoneField.value : (button?.dataset.defaultPhone || '');
+        const phone = button?.dataset.defaultPhone || '';
         const message = (messageField?.value || button?.dataset.defaultMessage || '').trim();
 
         openWhatsApp(phone, message);

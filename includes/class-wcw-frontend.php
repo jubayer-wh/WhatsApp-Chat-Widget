@@ -147,37 +147,16 @@ class WCW_Frontend
 
             <div class="wcw-panel" aria-hidden="true">
                 <div class="wcw-panel-header">
-                    <div class="wcw-avatar" aria-hidden="true">💬</div>
                     <div class="wcw-header-text">
-                        <strong><?php echo esc_html__('WhatsApp Support', 'whatsapp-chat-widget'); ?></strong>
-                        <span><?php echo esc_html__('Typically replies in a few minutes', 'whatsapp-chat-widget'); ?></span>
+                        <strong><?php echo esc_html__('Chat with us', 'whatsapp-chat-widget'); ?></strong>
                     </div>
-                    <div class="wcw-header-dot" aria-hidden="true">•••</div>
-                </div>
-
-                <div class="wcw-chat-preview" aria-hidden="true">
-                    <div class="wcw-bubble wcw-bubble-in"><?php echo esc_html__('Hello 👋 Need help?', 'whatsapp-chat-widget'); ?></div>
-                    <div class="wcw-bubble wcw-bubble-out"><?php echo esc_html((string) $settings['tooltip_text'] ?: __('I need some information.', 'whatsapp-chat-widget')); ?></div>
                 </div>
 
                 <form class="wcw-form" novalidate>
-                    <?php if (count($contacts) > 1) : ?>
-                        <label class="wcw-label" for="wcw-contact-<?php echo esc_attr(md5($source)); ?>"><?php echo esc_html__('Choose a contact', 'whatsapp-chat-widget'); ?></label>
-                        <select id="wcw-contact-<?php echo esc_attr(md5($source)); ?>" class="wcw-select" name="contact" aria-label="<?php echo esc_attr__('Choose WhatsApp contact', 'whatsapp-chat-widget'); ?>">
-                            <?php foreach ($contacts as $index => $contact) : ?>
-                                <option value="<?php echo esc_attr($contact['number']); ?>" <?php selected($index, 0); ?>>
-                                    <?php echo esc_html($contact['name'] . ' (+' . $contact['number'] . ')'); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    <?php endif; ?>
-
-                    <label class="wcw-label" for="wcw-message-<?php echo esc_attr(md5($source)); ?>"><?php echo esc_html__('Type your message', 'whatsapp-chat-widget'); ?></label>
-                    <textarea id="wcw-message-<?php echo esc_attr(md5($source)); ?>" class="wcw-input" name="message" rows="3" placeholder="<?php echo esc_attr__('Type your message…', 'whatsapp-chat-widget'); ?>"><?php echo esc_textarea($message_raw); ?></textarea>
-                    <div class="wcw-panel-actions">
-                        <button type="button" class="wcw-close" aria-label="<?php echo esc_attr__('Close WhatsApp form', 'whatsapp-chat-widget'); ?>"><?php echo esc_html__('Close', 'whatsapp-chat-widget'); ?></button>
+                    <label class="wcw-label" for="wcw-message-<?php echo esc_attr(md5($source)); ?>"><?php echo esc_html__('Message', 'whatsapp-chat-widget'); ?></label>
+                    <div class="wcw-input-row">
+                        <textarea id="wcw-message-<?php echo esc_attr(md5($source)); ?>" class="wcw-input" name="message" rows="3" placeholder="<?php echo esc_attr__('Type your message…', 'whatsapp-chat-widget'); ?>"></textarea>
                         <button type="submit" class="wcw-send" aria-label="<?php echo esc_attr__('Send message on WhatsApp', 'whatsapp-chat-widget'); ?>">
-                            <span><?php echo esc_html__('Send', 'whatsapp-chat-widget'); ?></span>
                             <span aria-hidden="true">➤</span>
                         </button>
                     </div>
