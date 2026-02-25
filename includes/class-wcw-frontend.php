@@ -17,12 +17,20 @@ class WCW_Frontend
     private $rendered_via_shortcode = false;
 
     /**
+     * Render guard to avoid duplicate output across hooks.
+     *
+     * @var bool
+     */
+    private $has_rendered = false;
+
+    /**
      * Constructor.
      */
     public function __construct()
     {
         add_action('wp_enqueue_scripts', [$this, 'enqueue_assets']);
-        add_action('wp_footer', [$this, 'render_widget']);
+        add_action('wp_body_open', [$this, 'render_widget'], 99);
+        add_action('wp_footer', [$this, 'render_widget'], 99);
         add_shortcode('whatsapp_chat_widget', [$this, 'shortcode']);
     }
 
@@ -66,7 +74,7 @@ class WCW_Frontend
         ]);
 
         if (! empty($settings['custom_css'])) {
-            wp_add_inline_style('wcw-widget', wp_strip_all_tags((string) $settings['custom_css']));
+            wp_add_inline_style('wcw-widget', (string) $settings['custom_css']);
         }
     }
 
@@ -77,7 +85,7 @@ class WCW_Frontend
      */
     public function render_widget()
     {
-        if ($this->rendered_via_shortcode) {
+        if ($this->rendered_via_shortcode || $this->has_rendered) {
             return;
         }
 
@@ -85,7 +93,13 @@ class WCW_Frontend
             return;
         }
 
-        echo $this->get_widget_markup(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        $markup = $this->get_widget_markup();
+        if ($markup === '') {
+            return;
+        }
+
+        $this->has_rendered = true;
+        echo $markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
     }
 
     /**
@@ -243,8 +257,7 @@ class WCW_Frontend
             return true;
         }
 
-        $now_ts = current_time('timestamp');
-        $day_key = strtolower((string) gmdate('D', $now_ts));
+        $day_key = strtolower(wp_date('D'));
         $day_key = substr($day_key, 0, 3);
 
         $day_settings = $hours[$day_key] ?? null;
@@ -256,9 +269,14 @@ class WCW_Frontend
             return false;
         }
 
-        $current_minutes = (int) gmdate('G', $now_ts) * 60 + (int) gmdate('i', $now_ts);
+        $current_minutes = ((int) wp_date('G') * 60) + (int) wp_date('i');
         $start_minutes = $this->time_to_minutes((string) ($day_settings['start'] ?? '00:00'));
         $end_minutes = $this->time_to_minutes((string) ($day_settings['end'] ?? '23:59'));
+
+        // Support overnight ranges (e.g. 22:00 -> 02:00).
+        if ($start_minutes > $end_minutes) {
+            return $current_minutes >= $start_minutes || $current_minutes <= $end_minutes;
+        }
 
         return $current_minutes >= $start_minutes && $current_minutes <= $end_minutes;
     }
