@@ -135,9 +135,6 @@ class WCW_Frontend
 
         $first = $contacts[0];
         $message_raw = (string) $settings['default_message'];
-        $message = rawurlencode($message_raw);
-        $wa_link = 'https://wa.me/' . rawurlencode($first['number']) . '?text=' . $message;
-
         $position_class = $settings['position'] === 'left' ? 'wcw-left' : 'wcw-right';
         $style = '--wcw-color:' . esc_attr((string) $settings['button_color']) . ';';
 
@@ -148,33 +145,43 @@ class WCW_Frontend
                 <div class="wcw-tooltip" role="status" aria-live="polite"><?php echo esc_html((string) $settings['tooltip_text']); ?></div>
             <?php endif; ?>
 
-            <div class="wcw-menu" hidden>
-                <?php foreach ($contacts as $contact) : ?>
-                    <?php
-                    $contact_link = 'https://wa.me/' . rawurlencode($contact['number']) . '?text=' . $message;
-                    ?>
-                    <a class="wcw-menu-item" href="<?php echo esc_url($contact_link); ?>" target="_blank" rel="noopener" aria-label="<?php echo esc_attr(sprintf(__('Chat with %s on WhatsApp', 'whatsapp-chat-widget'), $contact['name'])); ?>">
-                        <span class="wcw-menu-name"><?php echo esc_html($contact['name']); ?></span>
-                        <span class="wcw-menu-number">+<?php echo esc_html($contact['number']); ?></span>
-                    </a>
-                <?php endforeach; ?>
+            <div class="wcw-panel" hidden>
+                <form class="wcw-form" novalidate>
+                    <?php if (count($contacts) > 1) : ?>
+                        <label class="wcw-label" for="wcw-contact-<?php echo esc_attr(md5($source)); ?>"><?php echo esc_html__('Choose a contact', 'whatsapp-chat-widget'); ?></label>
+                        <select id="wcw-contact-<?php echo esc_attr(md5($source)); ?>" class="wcw-select" name="contact" aria-label="<?php echo esc_attr__('Choose WhatsApp contact', 'whatsapp-chat-widget'); ?>">
+                            <?php foreach ($contacts as $index => $contact) : ?>
+                                <option value="<?php echo esc_attr($contact['number']); ?>" <?php selected($index, 0); ?>>
+                                    <?php echo esc_html($contact['name'] . ' (+' . $contact['number'] . ')'); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    <?php endif; ?>
+
+                    <label class="wcw-label" for="wcw-message-<?php echo esc_attr(md5($source)); ?>"><?php echo esc_html__('Message', 'whatsapp-chat-widget'); ?></label>
+                    <textarea id="wcw-message-<?php echo esc_attr(md5($source)); ?>" class="wcw-input" name="message" rows="3" placeholder="<?php echo esc_attr__('Type your message…', 'whatsapp-chat-widget'); ?>"><?php echo esc_textarea($message_raw); ?></textarea>
+                    <div class="wcw-panel-actions">
+                        <button type="button" class="wcw-close" aria-label="<?php echo esc_attr__('Close WhatsApp form', 'whatsapp-chat-widget'); ?>"><?php echo esc_html__('Close', 'whatsapp-chat-widget'); ?></button>
+                        <button type="submit" class="wcw-send" aria-label="<?php echo esc_attr__('Send message on WhatsApp', 'whatsapp-chat-widget'); ?>">
+                            <span><?php echo esc_html__('Send', 'whatsapp-chat-widget'); ?></span>
+                            <span aria-hidden="true">➤</span>
+                        </button>
+                    </div>
+                </form>
             </div>
 
-            <a class="wcw-button"
-                href="<?php echo esc_url($wa_link); ?>"
-                target="_blank"
-                rel="noopener"
-                aria-label="<?php echo esc_attr__('Open WhatsApp chat', 'whatsapp-chat-widget'); ?>"
-                data-has-multiple="<?php echo esc_attr(count($contacts) > 1 ? '1' : '0'); ?>"
-                data-phone="<?php echo esc_attr($first['number']); ?>"
-                data-message="<?php echo esc_attr($message_raw); ?>">
+            <button type="button" class="wcw-button"
+                aria-label="<?php echo esc_attr__('Open WhatsApp chat form', 'whatsapp-chat-widget'); ?>"
+                aria-expanded="false"
+                data-default-phone="<?php echo esc_attr($first['number']); ?>"
+                data-default-message="<?php echo esc_attr($message_raw); ?>">
                 <span class="wcw-icon" aria-hidden="true">
                     <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
                         <path d="M16.04 3C9.03 3 3.33 8.7 3.33 15.72c0 2.23.58 4.41 1.67 6.33L3 29l7.12-1.87a12.67 12.67 0 0 0 5.92 1.5h.01c7.01 0 12.7-5.7 12.7-12.71A12.7 12.7 0 0 0 16.04 3Zm7.39 17.98c-.31.86-1.78 1.65-2.46 1.75-.64.09-1.45.13-2.34-.16-.55-.17-1.26-.41-2.17-.8-3.82-1.66-6.3-5.54-6.5-5.8-.2-.27-1.56-2.08-1.56-3.96 0-1.89.98-2.82 1.33-3.21.35-.4.76-.49 1.02-.49s.5 0 .72.01c.23.01.53-.09.82.6.31.74 1.07 2.56 1.17 2.75.1.18.16.4.03.65-.12.24-.18.4-.36.61-.18.22-.38.49-.54.66-.18.18-.37.37-.16.73.2.36.9 1.49 1.93 2.42 1.33 1.18 2.46 1.55 2.81 1.73.35.18.56.15.77-.09.21-.24.88-1.02 1.12-1.37.23-.35.47-.29.79-.17.33.11 2.09.99 2.45 1.16.36.18.6.27.69.42.08.14.08.85-.24 1.71Z"/>
                     </svg>
                 </span>
                 <span class="screen-reader-text"><?php echo esc_html__('Chat on WhatsApp', 'whatsapp-chat-widget'); ?></span>
-            </a>
+            </button>
         </div>
         <?php
         return (string) ob_get_clean();

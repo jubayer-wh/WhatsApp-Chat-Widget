@@ -67,41 +67,100 @@
 
 .wcw-tooltip.wcw-hidden { display: none; }
 
-.wcw-menu {
+.wcw-panel {
   background: #fff;
   border-radius: 14px;
   margin-bottom: 10px;
-  min-width: 220px;
+  width: min(320px, calc(100vw - 28px));
   overflow: hidden;
   box-shadow: 0 12px 30px rgba(0, 0, 0, .16);
   border: 1px solid rgba(0, 0, 0, .08);
+  transform-origin: bottom right;
+  animation: wcwPanelIn .2s ease;
 }
 
-.wcw-menu-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 10px 12px;
-  text-decoration: none;
+.wcw-form {
+  padding: 12px;
+}
+
+.wcw-label {
+  display: block;
+  margin: 0 0 6px;
+  color: #374151;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.wcw-select,
+.wcw-input {
+  width: 100%;
+  border: 1px solid rgba(0, 0, 0, .16);
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 10px;
+  font: inherit;
+  font-size: 14px;
+  background: #fff;
   color: #111827;
+}
+
+.wcw-input {
+  resize: vertical;
+  min-height: 86px;
+}
+
+.wcw-panel-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.wcw-close,
+.wcw-send {
+  border: 0;
+  border-radius: 10px;
+  padding: 9px 12px;
+  cursor: pointer;
+  font: inherit;
   font-size: 14px;
 }
-.wcw-menu-item:hover { background: #f9fafb; }
-.wcw-menu-number { color: #6b7280; font-size: 12px; }
+
+.wcw-close {
+  background: #eef2f7;
+  color: #374151;
+}
+
+.wcw-send {
+  background: var(--wcw-color);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+@keyframes wcwPanelIn {
+  from { opacity: 0; transform: translateY(6px) scale(.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
 
 @media (prefers-color-scheme: dark) {
   .wcw-tooltip {
     background: color-mix(in srgb, var(--wcw-color) 20%, #111827);
     color: #f9fafb;
   }
-  .wcw-menu {
+  .wcw-panel {
     background: #111827;
     border-color: rgba(255, 255, 255, .10);
   }
-  .wcw-menu-item { color: #f9fafb; }
-  .wcw-menu-item:hover { background: rgba(255, 255, 255, .06); }
-  .wcw-menu-number { color: #d1d5db; }
+  .wcw-label,
+  .wcw-input,
+  .wcw-select { color: #f9fafb; }
+  .wcw-input,
+  .wcw-select {
+    background: #0b1220;
+    border-color: rgba(255, 255, 255, .2);
+  }
+  .wcw-close { background: #1f2937; color: #f9fafb; }
 }
 
 @media (max-width: 768px) {

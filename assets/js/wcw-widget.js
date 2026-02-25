@@ -5,6 +5,25 @@
 
   let shownByExitIntent = false;
 
+  const openWhatsApp = (phone, message) => {
+    const safePhone = encodeURIComponent((phone || '').replace(/\D+/g, ''));
+    const safeMessage = encodeURIComponent(message || '');
+    if (!safePhone) return;
+
+    const isMobile = /Android|iPhone|iPad|iPod|IEMobile|Opera Mini/i.test(navigator.userAgent || '');
+    const waWeb = `https://wa.me/${safePhone}?text=${safeMessage}`;
+
+    if (isMobile) {
+      window.location.href = `whatsapp://send?phone=${safePhone}&text=${safeMessage}`;
+      window.setTimeout(() => {
+        window.open(waWeb, '_blank', 'noopener');
+      }, 450);
+      return;
+    }
+
+    window.open(waWeb, '_blank', 'noopener');
+  };
+
   const revealWidget = (widget) => {
     widget.classList.remove('wcw-animate-init');
     widget.classList.add('wcw-ready');
@@ -22,28 +41,49 @@
     }
   };
 
+  const setPanelState = (widget, isOpen) => {
+    const panel = widget.querySelector('.wcw-panel');
+    const button = widget.querySelector('.wcw-button');
+    if (!panel || !button) return;
+
+    panel.hidden = !isOpen;
+    button.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+
+    if (isOpen) {
+      const input = panel.querySelector('.wcw-input');
+      if (input) input.focus();
+    }
+  };
+
   const setupWidget = (widget) => {
     const button = widget.querySelector('.wcw-button');
-    const menu = widget.querySelector('.wcw-menu');
-    const isMobile = /Android|iPhone|iPad|iPod|IEMobile|Opera Mini/i.test(navigator.userAgent || '');
+    const panel = widget.querySelector('.wcw-panel');
+    const form = widget.querySelector('.wcw-form');
+    const closeBtn = widget.querySelector('.wcw-close');
 
-    if (button && menu && button.dataset.hasMultiple === '1') {
-      button.addEventListener('click', (event) => {
-        event.preventDefault();
-        menu.hidden = !menu.hidden;
-      });
-    } else if (button && isMobile && button.dataset.phone) {
-      button.addEventListener('click', (event) => {
-        event.preventDefault();
-        const msg = encodeURIComponent(button.dataset.message || '');
-        const phone = encodeURIComponent(button.dataset.phone);
-        window.location.href = `whatsapp://send?phone=${phone}&text=${msg}`;
+    if (button && panel) {
+      button.addEventListener('click', () => {
+        setPanelState(widget, panel.hidden);
       });
     }
 
-    if (button && Number(config.gaEventEnabled)) {
-      button.addEventListener('click', () => {
-        if (typeof window.gtag === 'function') {
+    if (closeBtn && panel) {
+      closeBtn.addEventListener('click', () => setPanelState(widget, false));
+    }
+
+    if (form) {
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        const phoneField = form.querySelector('.wcw-select');
+        const messageField = form.querySelector('.wcw-input');
+        const phone = phoneField ? phoneField.value : (button?.dataset.defaultPhone || '');
+        const message = (messageField?.value || button?.dataset.defaultMessage || '').trim();
+
+        openWhatsApp(phone, message);
+        setPanelState(widget, false);
+
+        if (Number(config.gaEventEnabled) && typeof window.gtag === 'function') {
           window.gtag('event', 'whatsapp_chat_click', {
             event_category: 'engagement',
             event_label: 'WhatsApp Widget'
@@ -51,6 +91,18 @@
         }
       });
     }
+
+    document.addEventListener('click', (event) => {
+      if (!widget.contains(event.target)) {
+        setPanelState(widget, false);
+      }
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        setPanelState(widget, false);
+      }
+    });
 
     if (!Number(config.animationEnabled)) {
       widget.classList.add('wcw-ready');
