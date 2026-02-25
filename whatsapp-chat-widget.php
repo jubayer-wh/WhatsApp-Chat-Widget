@@ -36,6 +36,22 @@ function wcw_init()
 add_action('plugins_loaded', 'wcw_init');
 
 /**
+ * Add quick settings link on plugins screen.
+ *
+ * @param string[] $links Existing links.
+ * @return string[]
+ */
+function wcw_add_settings_link($links)
+{
+    $url = admin_url('options-general.php?page=wcw-settings');
+    $settings_link = '<a href="' . esc_url($url) . '">' . esc_html__('Settings', 'whatsapp-chat-widget') . '</a>';
+    array_unshift($links, $settings_link);
+
+    return $links;
+}
+add_filter('plugin_action_links_' . plugin_basename(WCW_FILE), 'wcw_add_settings_link');
+
+/**
  * Default settings.
  *
  * @return array<string, mixed>

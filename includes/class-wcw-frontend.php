@@ -10,6 +10,13 @@ if (! defined('ABSPATH')) {
 class WCW_Frontend
 {
     /**
+     * Shortcode render flag.
+     *
+     * @var bool
+     */
+    private $rendered_via_shortcode = false;
+
+    /**
      * Constructor.
      */
     public function __construct()
@@ -70,6 +77,10 @@ class WCW_Frontend
      */
     public function render_widget()
     {
+        if ($this->rendered_via_shortcode) {
+            return;
+        }
+
         if (! $this->should_render()) {
             return;
         }
@@ -87,6 +98,8 @@ class WCW_Frontend
         if (! $this->should_render()) {
             return '';
         }
+
+        $this->rendered_via_shortcode = true;
 
         return $this->get_widget_markup('shortcode');
     }
@@ -107,7 +120,8 @@ class WCW_Frontend
         }
 
         $first = $contacts[0];
-        $message = rawurlencode((string) $settings['default_message']);
+        $message_raw = (string) $settings['default_message'];
+        $message = rawurlencode($message_raw);
         $wa_link = 'https://wa.me/' . rawurlencode($first['number']) . '?text=' . $message;
 
         $position_class = $settings['position'] === 'left' ? 'wcw-left' : 'wcw-right';
@@ -137,7 +151,9 @@ class WCW_Frontend
                 target="_blank"
                 rel="noopener"
                 aria-label="<?php echo esc_attr__('Open WhatsApp chat', 'whatsapp-chat-widget'); ?>"
-                data-has-multiple="<?php echo esc_attr(count($contacts) > 1 ? '1' : '0'); ?>">
+                data-has-multiple="<?php echo esc_attr(count($contacts) > 1 ? '1' : '0'); ?>"
+                data-phone="<?php echo esc_attr($first['number']); ?>"
+                data-message="<?php echo esc_attr($message_raw); ?>">
                 <span class="wcw-icon" aria-hidden="true">
                     <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
                         <path d="M16.04 3C9.03 3 3.33 8.7 3.33 15.72c0 2.23.58 4.41 1.67 6.33L3 29l7.12-1.87a12.67 12.67 0 0 0 5.92 1.5h.01c7.01 0 12.7-5.7 12.7-12.71A12.7 12.7 0 0 0 16.04 3Zm7.39 17.98c-.31.86-1.78 1.65-2.46 1.75-.64.09-1.45.13-2.34-.16-.55-.17-1.26-.41-2.17-.8-3.82-1.66-6.3-5.54-6.5-5.8-.2-.27-1.56-2.08-1.56-3.96 0-1.89.98-2.82 1.33-3.21.35-.4.76-.49 1.02-.49s.5 0 .72.01c.23.01.53-.09.82.6.31.74 1.07 2.56 1.17 2.75.1.18.16.4.03.65-.12.24-.18.4-.36.61-.18.22-.38.49-.54.66-.18.18-.37.37-.16.73.2.36.9 1.49 1.93 2.42 1.33 1.18 2.46 1.55 2.81 1.73.35.18.56.15.77-.09.21-.24.88-1.02 1.12-1.37.23-.35.47-.29.79-.17.33.11 2.09.99 2.45 1.16.36.18.6.27.69.42.08.14.08.85-.24 1.71Z"/>
@@ -272,6 +288,10 @@ class WCW_Frontend
      */
     private function is_allowed_page($current_id, $include_csv, $exclude_csv)
     {
+        if (is_feed() || is_404() || is_search()) {
+            return false;
+        }
+
         $include = $this->csv_to_int_array($include_csv);
         $exclude = $this->csv_to_int_array($exclude_csv);
 

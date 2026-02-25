@@ -105,3 +105,11 @@
   .wcw-widget.wcw-left { left: 14px; }
   .wcw-button { width: 56px; height: 56px; }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .wcw-widget,
+  .wcw-button {
+    transition: none;
+    animation: none !important;
+  }
+}

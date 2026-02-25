@@ -114,6 +114,10 @@ class WCW_Admin
      */
     public function sanitize_settings($input)
     {
+        if (! is_array($input)) {
+            return wcw_get_default_settings();
+        }
+
         $defaults = wcw_get_default_settings();
         $clean = $defaults;
 
@@ -129,7 +133,7 @@ class WCW_Admin
         $clean['delay_seconds'] = min(60, max(0, absint($input['delay_seconds'] ?? 0)));
         $clean['exit_intent_enabled'] = ! empty($input['exit_intent_enabled']) ? 1 : 0;
         $clean['ga_event_enabled'] = ! empty($input['ga_event_enabled']) ? 1 : 0;
-        $clean['custom_css'] = wp_strip_all_tags($input['custom_css'] ?? '');
+        $clean['custom_css'] = $this->sanitize_custom_css((string) ($input['custom_css'] ?? ''));
         $clean['include_pages'] = preg_replace('/[^0-9,]/', '', (string) ($input['include_pages'] ?? ''));
         $clean['exclude_pages'] = preg_replace('/[^0-9,]/', '', (string) ($input['exclude_pages'] ?? ''));
 
@@ -354,5 +358,24 @@ class WCW_Admin
         }
 
         return '09:00';
+    }
+
+    /**
+     * Best-effort custom CSS sanitization without stripping CSS syntax.
+     *
+     * @param string $css Raw css input.
+     * @return string
+     */
+    private function sanitize_custom_css($css)
+    {
+        // Remove HTML tags and null bytes while preserving CSS braces/selectors.
+        $css = wp_kses($css, []);
+        $css = str_replace("\0", '', $css);
+
+        // Block obvious remote/script injection vectors.
+        $css = preg_replace('/@import\s+url\s*\(.+?\)\s*;?/i', '', (string) $css);
+        $css = preg_replace('/expression\s*\(|javascript\s*:/i', '', (string) $css);
+
+        return trim((string) $css);
     }
 }

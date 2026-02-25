@@ -24,11 +24,19 @@
   const setupWidget = (widget) => {
     const button = widget.querySelector('.wcw-button');
     const menu = widget.querySelector('.wcw-menu');
+    const isMobile = /Android|iPhone|iPad|iPod|IEMobile|Opera Mini/i.test(navigator.userAgent || '');
 
     if (button && menu && button.dataset.hasMultiple === '1') {
       button.addEventListener('click', (event) => {
         event.preventDefault();
         menu.hidden = !menu.hidden;
+      });
+    } else if (button && isMobile && button.dataset.phone) {
+      button.addEventListener('click', (event) => {
+        event.preventDefault();
+        const msg = encodeURIComponent(button.dataset.message || '');
+        const phone = encodeURIComponent(button.dataset.phone);
+        window.location.href = `whatsapp://send?phone=${phone}&text=${msg}`;
       });
     }
 
