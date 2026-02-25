@@ -71,6 +71,7 @@ function wcw_get_default_settings()
         'pulse_enabled' => 1,
         'delay_seconds' => 3,
         'exit_intent_enabled' => 0,
+        'working_hours_enabled' => 0,
         'working_hours' => [
             'mon' => ['enabled' => 1, 'start' => '09:00', 'end' => '18:00'],
             'tue' => ['enabled' => 1, 'start' => '09:00', 'end' => '18:00'],

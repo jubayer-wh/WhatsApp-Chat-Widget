@@ -87,6 +87,7 @@ class WCW_Admin
             'pulse_enabled' => __('Enable Pulse Animation', 'whatsapp-chat-widget'),
             'delay_seconds' => __('Delay Appearance (seconds)', 'whatsapp-chat-widget'),
             'exit_intent_enabled' => __('Enable Exit Intent (Desktop)', 'whatsapp-chat-widget'),
+            'working_hours_enabled' => __('Enable Working Hours Schedule', 'whatsapp-chat-widget'),
             'ga_event_enabled' => __('Enable Google Analytics Click Event', 'whatsapp-chat-widget'),
             'working_hours' => __('Working Hours', 'whatsapp-chat-widget'),
             'include_pages' => __('Show Only on Page IDs', 'whatsapp-chat-widget'),
@@ -132,6 +133,7 @@ class WCW_Admin
         $clean['pulse_enabled'] = ! empty($input['pulse_enabled']) ? 1 : 0;
         $clean['delay_seconds'] = min(60, max(0, absint($input['delay_seconds'] ?? 0)));
         $clean['exit_intent_enabled'] = ! empty($input['exit_intent_enabled']) ? 1 : 0;
+        $clean['working_hours_enabled'] = ! empty($input['working_hours_enabled']) ? 1 : 0;
         $clean['ga_event_enabled'] = ! empty($input['ga_event_enabled']) ? 1 : 0;
         $clean['custom_css'] = $this->sanitize_custom_css((string) ($input['custom_css'] ?? ''));
         $clean['include_pages'] = preg_replace('/[^0-9,]/', '', (string) ($input['include_pages'] ?? ''));
@@ -174,6 +176,7 @@ class WCW_Admin
             case 'animation_enabled':
             case 'pulse_enabled':
             case 'exit_intent_enabled':
+            case 'working_hours_enabled':
             case 'ga_event_enabled':
                 printf(
                     '<label><input type="checkbox" name="%1$s" value="1" %2$s> %3$s</label>',

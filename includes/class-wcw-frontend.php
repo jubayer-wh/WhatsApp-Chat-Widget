@@ -196,7 +196,7 @@ class WCW_Frontend
             return false;
         }
 
-        if (! $this->is_within_working_hours($settings['working_hours'] ?? [])) {
+        if (! empty($settings['working_hours_enabled']) && ! $this->is_within_working_hours($settings['working_hours'] ?? [])) {
             return false;
         }
 

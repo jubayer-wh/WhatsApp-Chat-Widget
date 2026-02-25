@@ -6,6 +6,7 @@
   let shownByExitIntent = false;
 
   const revealWidget = (widget) => {
+    widget.classList.remove('wcw-animate-init');
     widget.classList.add('wcw-ready');
 
     if (Number(config.pulseEnabled)) {
@@ -56,6 +57,7 @@
       return;
     }
 
+    widget.classList.add('wcw-animate-init');
     const delay = Math.max(0, Number(config.delay || 0)) * 1000;
     window.setTimeout(() => revealWidget(widget), delay);
   };
