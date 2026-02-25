@@ -62,6 +62,9 @@
     const panel = widget.querySelector('.wcw-panel');
 
     if (button && panel) {
+      // Keep closed by default. Opens only on explicit user click.
+      setPanelState(widget, false);
+
       button.addEventListener('click', () => {
         setPanelState(widget, !widget.classList.contains('is-open'));
       });
