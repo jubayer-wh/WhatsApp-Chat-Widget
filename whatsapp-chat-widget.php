@@ -1,10 +1,10 @@
 <?php
 /**
  * Plugin Name: WhatsApp Chat Widget
- * Plugin URI:  https://example.com/whatsapp-chat-widget
+ * Plugin URI:  https://github.com/jubayer-wh/WhatsApp-Chat-Widget
  * Description: Lightweight, modern, and responsive WhatsApp chat widget with scheduling, animation controls, and shortcode support.
  * Version:     1.0.0
- * Author:      ChatGPT
+ * Author:      Jubayer Hossain
  * Text Domain: whatsapp-chat-widget
  * Requires at least: 6.0
  * Requires PHP: 7.4
