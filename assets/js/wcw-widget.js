@@ -46,7 +46,8 @@
     const button = widget.querySelector('.wcw-button');
     if (!panel || !button) return;
 
-    panel.hidden = !isOpen;
+    widget.classList.toggle('is-open', isOpen);
+    panel.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
     button.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
 
     if (isOpen) {
@@ -63,7 +64,7 @@
 
     if (button && panel) {
       button.addEventListener('click', () => {
-        setPanelState(widget, panel.hidden);
+        setPanelState(widget, !widget.classList.contains('is-open'));
       });
     }
 
